@@ -1,13 +1,13 @@
 {
   "dataset": "ZOMBIE MODE: Fog of Containment dataset",
-  "version": "v1.0.2",
-  "source_url": "https://github.com/anjalikhatri019-hub/zombie-mode-fog-containment-dataset/releases/tag/v1.0.2",
+  "version": "v1.0.3",
+  "source_url": "https://github.com/anjalikhatri019-hub/zombie-mode-fog-containment-dataset/releases/tag/v1.0.3",
   "origin": "creator-owned synthetic; no external observations",
   "license": "CC0-1.0",
   "asset": {
     "name": "zombie_mode_public.zip",
-    "bytes": 269230266,
-    "sha256": "bb4f60b58b4f283b4be378328fd12cc8a859428be7d00afe1d2335174d5e7e22"
+    "bytes": 269233438,
+    "sha256": "6acc4c9e490d9e8dc4565647f3892b9d2b7ccbac38490aeea5ac6a3cb1e6ca7b"
   },
   "members": {
     "sensors/bfd7621d07d1aa0a85cf.npy": {
@@ -2072,11 +2072,11 @@
     },
     "DATASET_CARD.md": {
       "bytes": 3890,
-      "sha256": "7f0a025ee8997b0b3c5ee70e60730e06b5f2c88b2e2ad8c7c6169258b1183cc1"
+      "sha256": "996c03b1b3d076a43ac66d9d424d8a98c7129b0aa5f8e06ce931f364344f655b"
     },
     "task_prompt.txt": {
-      "bytes": 2458,
-      "sha256": "3d2b9aca85b0fb15f32df4da99c3dc128fe1f5c580fc967986e8b2c916eaa714"
+      "bytes": 5630,
+      "sha256": "18670a1a672ed58f07534d3b8027fdb3b76842fbee81fe712e6fc13e80abff9c"
     }
   }
 }

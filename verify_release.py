@@ -1,4 +1,4 @@
-"""Verify participant-safe v1.0.2 asset and every ZIP member. MIT licensed."""
+"""Verify participant-safe v1.0.3 asset and every ZIP member. MIT licensed."""
 import hashlib
 import json
 from pathlib import Path

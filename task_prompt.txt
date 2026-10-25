@@ -1,0 +1,54 @@
+## Overview
+
+Command four ordered response deployments in a fictional city under “zombie mode.” For each evaluation city, eight noisy sensor frames show how the simulated outbreak has moved so far. Twelve locally numbered response hubs and their crew capacities are available. Submit one ordered list of four distinct hubs. The deployments are scored against a private burden field seven frame intervals after the last observation. A good policy must forecast where demand will be, choose useful hubs, and account for overlap and the order in which crews are committed.
+
+All cities, sensors, and response outcomes are creator-owned synthetic data. They are not measurements of people, disease, or real intervention effectiveness. The task evaluates inference and constrained decision making within this fictional simulator.
+
+## Research question
+
+Can a solver use noisy temporal and spatial evidence to choose a high-value ordered response policy for mechanism families absent from training? A last-frame hotspot map can miss movement before deployment. Choosing the four hubs with the largest individual benefits can also lose value when their response footprints overlap or earlier deployments consume crews needed later. The target is the realized value of the complete four-hub policy, not accuracy on any single sensor channel, hub, or intermediate payoff alone.
+
+## Generalization setting
+
+The corpus has 512 cities in 16 mechanism families, with 32 cities per family. Training contains 384 cities from families 0–11; evaluation contains 128 cities from families 12–15. Families vary hotspot count, sensor noise, and nuisance interference. Family labels and generator indices are not participant inputs. The same sensor tensor and hub action schema apply to both splits. Hub indices have only case-local meaning: index 0 in one city is not a fixed location, role, or tactic in another. `case_id`, row order, and `sensor_path` address data; they are not predictive features.
+
+## Data
+
+The participant data contains:
+
+- `train.csv`: 384 rows with `case_id,sensor_path,hubs_json,capacity_json,base_json,pair_json,oracle,random_mean,oracle_policy`.
+- `test.csv`: 128 rows with `case_id,sensor_path,hubs_json,capacity_json`. Test payoff fields are not supplied.
+- `sample_submission.csv`: one structurally valid, weak four-hub policy per test case.
+- `sensors/<case_id>.npy`: one array per city, shape `(8,64,64,8)`, dtype `uint16`. Axes are observation time, y, x, and channel. Divide values by 65535 to map the quantized observations to `[0,1]`.
+- `DATASET_CARD.md`: channel definitions, field semantics, source, and limitations.
+- `task_prompt.txt`: this challenge description.
+
+Each `hubs_json` value is a JSON list of twelve `[x,y]` integer grid coordinates on the zero-based 64×64 map. Each `capacity_json` value is a JSON list of twelve positive unitless crew multipliers in that same local order. Sensor channels 0–7 represent noisy presence, mixed thermal/population response, horizontally and vertically displaced presence, population, road density, presence-population interaction, and nuisance beacon interference. These are simulation units, not clinical measurements.
+
+Training labels give twelve `base_json` single-hub benefits and a directed 12×12 `pair_json` shared-crew cost matrix in synthetic utility units. They are realized payoffs, not probabilities or normalized scores. `oracle` is the maximum value over every ordered four-hub policy, `random_mean` is the arithmetic mean over those policies, and `oracle_policy` is one maximizing policy. The diagonal of `pair_json` is zero; submitted policies cannot repeat a hub.
+
+## Submission
+
+Submit a UTF-8 CSV with exactly the columns `case_id,policy` and one row for every evaluation ID. Each `policy` cell is a JSON array of exactly four **distinct integers** from 0 through 11. The array order is the deployment order. For example, these are two valid rows under the required header:
+
+```csv
+case_id,policy
+cfd5881c073f5584240e,"[0,3,5,8]"
+d1f64c671646a07f79ba,"[11,2,7,4]"
+```
+
+Those policies illustrate syntax, not optimal actions or a complete submission. Use every ID in `test.csv` for the full file. The public sample provides a complete valid file.
+
+## Evaluation
+
+For policy `p = (p0,p1,p2,p3)`, its realized utility is
+
+`U(p) = Σ(t=0..3) (1 − 0.09t) × base[p_t] − Σ(0≤s<t≤3) pair[p_s,p_t]`.
+
+Pair costs are directed: `pair[a,b]` is charged when hub `a` is deployed before hub `b`. For each evaluated city the score is `clip((U(p) − random_mean) / (oracle − random_mean), 0, 1)`. `random_mean` averages all `12P4 = 11,880` ordered four-hub policies; `oracle` is their maximum. The final score is the arithmetic mean of city scores, with higher better and bounds 0–1. Equivalent maximum-value policies receive the same credit.
+
+A malformed policy for an evaluated city scores zero for that city. A wrong or duplicate column, extra CSV field, blank or duplicate ID, or missing evaluated ID makes the full submission score zero. Rows outside the evaluated answer slice may be present, but their IDs must still be nonblank and unique. The grader uses the private realized payoff table, not participant-supplied claims about utility.
+
+## What not to use
+
+Use the provided public training labels, test inputs, and sensor arrays as the benchmark evidence. Do not access organizer-only answers, generator seeds, private evaluation files, or external copies of held-out outcomes. Do not treat case IDs, filenames, row order, or the public source page as answer keys. No pretrained model or external dataset is supplied or required.
